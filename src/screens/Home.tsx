@@ -1,4 +1,6 @@
 import { useState } from 'react'
+import auth from '@react-native-firebase/auth'
+import { Alert } from 'react-native'
 import { useNavigation } from '@react-navigation/native'
 import { Heading, HStack, IconButton, Text, useTheme, VStack, FlatList, Center } from 'native-base';
 
@@ -25,6 +27,15 @@ export function Home() {
         navigation.navigate('details', { orderId })
     }
 
+    function handleSignOut() {
+        auth()
+            .signOut()
+            .catch(error => {
+                console.log(error)
+                return Alert.alert('Sair', 'Ocorreu um erro inesperado.')
+            })
+    }
+
     return (
         <VStack flex={1} pb={6} bg="gray.700">
             <HStack
@@ -40,6 +51,7 @@ export function Home() {
 
                 <IconButton 
                     icon={<SignOut size={26} color={colors.gray[300]} />}
+                    onPress={handleSignOut}
                 />
             </HStack>
 

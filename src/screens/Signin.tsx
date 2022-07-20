@@ -1,19 +1,44 @@
 import { useState } from 'react'
+import { Alert } from 'react-native';
 import { Heading, Icon, useTheme, VStack } from 'native-base'
 import { Envelope, Key } from 'phosphor-react-native'
+import auth from '@react-native-firebase/auth'
 
 import Logo from '../assets/logo_primary.svg'
 import { Input } from '../components/Input'
 import { Button } from '../components/Button'
 
 export function SignIn() {
+    const [isLoading, setIsLoading] = useState(false)
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
 
     const { colors } = useTheme()
 
     function handleSignIn() {
-        console.log(email, password)
+        if (!email || !password) {
+            return Alert.alert('Atenção', 'Informe o e-mail e a senha!')
+        }
+
+        setIsLoading(true)
+
+        auth()
+            .signInWithEmailAndPassword(email, password)
+            .catch((error) => {
+                console.log(error)
+
+                setIsLoading(false)
+
+                if (error.code == 'auth/invalid-email') {
+                    return Alert.alert('Atenção', 'Informe um e-mail válido!')
+                }
+
+                if (error.code == 'auth/user-not-found' || error.code == 'auth/wrong-password') {
+                    return Alert.alert('Atenção', 'Usuário ou senha não conferem!')
+                }
+
+                return Alert.alert('Entrar', 'Não foi possível acessar.')
+            })
     }
 
     return (
@@ -43,6 +68,7 @@ export function SignIn() {
                 title="Entrar" 
                 w="full" 
                 onPress={handleSignIn} 
+                isLoading={isLoading}
             />
         </VStack>
     )
