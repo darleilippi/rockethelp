@@ -1,18 +1,22 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import auth from '@react-native-firebase/auth'
+import firestore from '@react-native-firebase/firestore'
 import { Alert } from 'react-native'
 import { useNavigation } from '@react-navigation/native'
 import { Heading, HStack, IconButton, Text, useTheme, VStack, FlatList, Center } from 'native-base';
-
 import { ChatTeardropText, SignOut } from 'phosphor-react-native'
+
+import { dateFormat } from '../utils/firestoreDateFormat'
 
 import Logo from '../assets/logo_secondary.svg'
 
 import { Filter } from '../components/Filter';
 import { Button } from '../components/Button';
 import { Order, OrderProps } from '../components/Order';
+import { Loading } from '../components/Loading';
 
 export function Home() {
+    const [loading, setIsLoading] = useState(true)
     const [statusSelected, setStatusSelected] = useState<'open' | 'closed'>('open')
     const [orders, setOrders] = useState<OrderProps[]>([])
 
@@ -35,6 +39,32 @@ export function Home() {
                 return Alert.alert('Sair', 'Ocorreu um erro inesperado.')
             })
     }
+
+    useEffect(() => {
+        setIsLoading(true) //quando trocar o filtro, também ativa o loading
+
+        const subscriver = firestore()
+            .collection('orders')
+            .where('status', '==', statusSelected)
+            .onSnapshot(snapshot => {
+                const data = snapshot.docs.map(doc => {
+                    const { patrimony, description, status, created_at } = doc.data()
+
+                    return {
+                        id: doc.id,
+                        patrimony,
+                        description,
+                        status,
+                        when: dateFormat(created_at)
+                    }
+                })
+
+                setOrders(data)
+                setIsLoading(false)
+            })
+
+        return subscriver
+    }, [statusSelected])
 
     return (
         <VStack flex={1} pb={6} bg="gray.700">
@@ -88,27 +118,30 @@ export function Home() {
                     />
                 </HStack>
 
-                <FlatList
-                    data={orders}
-                    keyExtractor={item => item.id}
-                    renderItem={({ item }) => <Order data={item} onPress={() => handleOpenDetails(item.id)} />}
-                    showsVerticalScrollIndicator={false}
-                    contentContainerStyle={{ paddingBottom: 100 }}
-                    ListEmptyComponent={() => (
-                        <Center>
-                            <ChatTeardropText color={colors.gray[300]} size={40} />
-                            <Text 
-                                color="gray.300" 
-                                fontSize="xl" 
-                                mt={6} 
-                                textAlign="center"
-                            >
-                                Você ainda não possui {'\n'}
-                                solicitações {statusSelected === 'open' ? 'em andamento' : 'finalizadas'}
-                            </Text>
-                        </Center>
-                    )}
-                />
+                {
+                    loading ? <Loading /> 
+                    : (<FlatList
+                        data={orders}
+                        keyExtractor={item => item.id}
+                        renderItem={({ item }) => <Order data={item} onPress={() => handleOpenDetails(item.id)} />}
+                        showsVerticalScrollIndicator={false}
+                        contentContainerStyle={{ paddingBottom: 100 }}
+                        ListEmptyComponent={() => (
+                            <Center>
+                                <ChatTeardropText color={colors.gray[300]} size={40} />
+                                <Text 
+                                    color="gray.300" 
+                                    fontSize="xl" 
+                                    mt={6} 
+                                    textAlign="center"
+                                >
+                                    Você ainda não possui {'\n'}
+                                    solicitações {statusSelected === 'open' ? 'em andamento' : 'finalizadas'}
+                                </Text>
+                            </Center>
+                        )}
+                    />
+                )}
 
                 <Button title='Nova solicitação' onPress={handleNewOrder}/>
                 
