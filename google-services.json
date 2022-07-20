@@ -1,0 +1,46 @@
+{
+  "project_info": {
+    "project_number": "734950049556",
+    "project_id": "rockethelp-d3ad6",
+    "storage_bucket": "rockethelp-d3ad6.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:734950049556:android:c9d9a8ef641679617b6401",
+        "android_client_info": {
+          "package_name": "com.lippidev.rockethelp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "734950049556-uma0ln0vqt5s3e12rve63b79n3mh7flu.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAeJddWvTVUOJFtw06RwXbOy_ZbDAPFi9U"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "734950049556-uma0ln0vqt5s3e12rve63b79n3mh7flu.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "734950049556-4lf6frelb6kgete6qnhej0sf94rj9rcn.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.lippidev.rockethelp"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
